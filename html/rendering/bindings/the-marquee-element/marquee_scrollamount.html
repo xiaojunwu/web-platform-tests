@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>HTML Test: marquee_scrollamount</title>
+    <link rel="author" title="Intel" href="http://www.intel.com/">
+    <link rel="help" href="http://www.w3.org/TR/2012/CR-html5-20121217/obsolete.html#the-marquee-element-0">
+    <script src="/resources/testharness.js"></script>
+    <script src="/resources/testharnessreport.js"></script>
+  </head>
+  <body>
+    <div id="log"></div>
+    <div>
+      <marquee id="test1" scrollamount="a">Test1</marquee>
+      <marquee id="test2" scrollamount="-1">Test2</marquee>
+      <marquee id="test3" scrollamount="10">Test3</marquee>
+    </div>
+    <script>
+      setup({explicit_done:true});
+
+      setTimeout(function() {test(function() {
+        var mq = document.getElementById("test1");
+        assert_equals(mq.scrollAmount, 6, "The value of scrollamount should be 6.");
+      }, "marquee_scrollamount_string");}, 100);
+
+      setTimeout(function() {test(function() {
+        var mq = document.getElementById("test2");
+        assert_equals(mq.scrollAmount, 6, "The value of scrollamount should be 6.");
+      }, "marquee_scrollamount_less_than_zero");}, 100);
+
+      setTimeout(function() {test(function() {
+        var mq = document.getElementById("test3");
+        assert_equals(mq.scrollAmount, 10, "The value of scrollamount should be 10.");
+      }, "marquee_scrollamount_normal");}, 100);
+
+      setTimeout(function(){done()}, 120);
+    </script>
+  </body>
+</html>
