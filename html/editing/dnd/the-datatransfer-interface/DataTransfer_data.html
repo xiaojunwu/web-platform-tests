@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>HTML Test: DataTransfer_operations</title>
+    <link rel="author" title="Intel" href="http://www.intel.com">
+    <link rel="help" href="http://www.w3.org/TR/2012/CR-html5-20121217/editing.html#dom-datatransfer-getdata">
+    <meta name="flags" content="interact">
+    <meta name="assert" content="Check the data can be clear by the clearData method of the DataTransferItemList interface">
+    <script src="/resources/testharness.js"></script>
+    <script src="/resources/testharnessreport.js"></script>
+  </head>
+  <body>
+    <h2>Steps:</h2>
+    <ol>
+      <li>Drag the blue square.</li>
+    </ol>
+    <h2>Expected result:</h2>
+    <p>PASS</p>
+    <div id="log"></div>
+    <div id="test1" draggable="true" style="background-color: blue; color:white; height: 100px; width: 100px;">Drag me</div>
+    <img id="test2" src="../../../../images/blue.png">
+    <script>
+      setup({explicit_timeout: true, explicit_done: true});
+      on_event(document.getElementById("test1"), "dragstart", function(evt) {
+        test(function () {
+          evt.dataTransfer.setData("text", "test");
+          assert_equals(evt.dataTransfer.items.length, 1, "The length of data items should be 1.");
+
+          evt.dataTransfer.setData("text/plain", "test");
+          assert_equals(evt.dataTransfer.items.length, 1, "The length of data items should be 1.");
+
+          evt.dataTransfer.setData("url", "http:\/\/www.intel.com/");
+          assert_equals(evt.dataTransfer.items.length, 2, "The length of data items should be 2.");
+        }, "DataTransfer_operations_setData");
+
+        test(function () { 
+          data = evt.dataTransfer.getData("text/plain");
+          assert_equals(data, "test", "The text didn't be set.");
+          data = evt.dataTransfer.getData("text/uri-list");
+          assert_equals(data, "http:\/\/www.intel.com/", "The url didn't be set.");
+        },"DataTransfer_operations_getData");
+
+        test(function () {
+          evt.dataTransfer.clearData();
+          assert_equals(evt.dataTransfer.items.length, 0, "The data didn't be cleared.");
+        }, "DataTransfer_operations_clearData");
+
+        test(function () {
+          try{
+            evt.dataTransfer.setDragImage(document.getElementById("test2"), 0, 0);
+          } catch (e){
+            assert_true(false, "Call the setDragImage method failed.");
+          }
+        }, "DataTransfer_operations_setDragImage");
+
+        done();
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>HTML Test: DataTransfer_items</title>
+    <link rel="author" title="Intel" href="http://www.intel.com">
+    <link rel="help" href="http://www.w3.org/TR/2012/CR-html5-20121217/editing.html#dom-datatransferitem-kind">
+    <meta name="flags" content="interact">
+    <meta name="asssert" content="Check the items attribute of the DataTransfer interface">
+    <script src="/resources/testharness.js"></script>
+    <script src="/resources/testharnessreport.js"></script>
+  </head>
+  <body>
+    <h2>Steps:</h2>
+    <ol>
+      <li>Select all characters in the textbox below.</li>
+      <li>Drag it to anywhere.(Execute these steps in 10 seconds.)</li>
+    </ol>
+    <h2>Expected result:</h2>
+    <p>PASS</p>
+    <input id="btn" type="text" value="Drag me">
+    <div id="log"></div>
+
+    <script>
+      var btn;
+      var t = async_test("Check if the items attribute of DataTransfer interface is a DataTransferItemList object");
+
+      setup(function() {
+        btn = document.getElementById("btn");
+      }, {timeout: 10000});
+
+      btn.addEventListener("dragstart", function (evt) {        
+        t.step(function () {
+          var items = evt.dataTransfer.items;
+          assert_class_string(items, "DataTransferItemList", "The class name of the items attribute should be 'DataTransferItemList'.");
+          assert_true(items instanceof DataTransferItemList);
+        });
+        t.done();
+      }, false);
+    </script>
+  </body>
+</html>

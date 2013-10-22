@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>HTML Test: DataTransfer_effectAllowed_dropEffect</title>
+    <link rel="author" title="Intel" href="http://www.intel.com">
+    <link rel="help" href="http://www.w3.org/TR/2012/CR-html5-20121217/editing.html#the-datatransfer-interface">
+    <link rel="help" href="http://www.w3.org/TR/2012/CR-html5-20121217/editing.html#dom-datatransfer-effectallowed">
+    <link rel="help" href="http://www.w3.org/TR/2012/CR-html5-20121217/editing.html#dom-datatransfer-dropeffect">
+    <meta name="flags" content="interact">
+    <meta name="asssert" content="Check the effectAllowed and dropEffect attributes of DataTransfer interface">
+    <script src="/resources/testharness.js"></script>
+    <script src="/resources/testharnessreport.js"></script>
+  </head>
+  <body>
+    <h2>Steps:</h2>
+    <ol>
+      <li>Select all characters in the textbox below.</li>
+      <li>Drag it out of the textbox.(Execute the steps in 10 seconds)</li>
+    </ol>
+    <h2>Expected result:</h2>
+    <p>PASS</p>
+    <input id="test1" type="text" value="Drag me">
+    <div id="log"></div>
+
+    <script>
+      setup({explicit_timeout: true, explicit_done: true});
+
+      on_event(document.getElementById("test1"), "dragstart", function(evt) {
+        test(function() {
+          assert_equals(evt.dataTransfer.effectAllowed, "uninitialized", "The effectAllowed attirbute should be 'uninitialized' when drag starts.");
+        }, "Check if the effectAllowed attirbute is 'uninitialized' when drag starts");
+
+        test(function() {
+          evt.dataTransfer.effectAllowed = "test";
+          assert_equals(evt.dataTransfer.effectAllowed, "uninitialized", "The effectAllowed attribute should not be changed by set an invalid value.");
+        }, "Check if the invalid value for effectAllowed attribute will left unchanged");
+
+        test(function() {
+          evt.dataTransfer.effectAllowed = "move";
+          assert_equals(evt.dataTransfer.effectAllowed, "move", "The effectAllowed attribute should be changed by set a valid value.");
+        }, "Check if the effectAllowed can be set by a valid value");
+
+        test(function() {
+          assert_equals(evt.dataTransfer.dropEffect, "none", "The dropEffect attribute should be 'none' when drag starts.");
+        }, "Check if the dropEffect attribute is 'none' when drag starts");
+
+        test(function() {
+          evt.dataTransfer.dropEffect = "test";
+          assert_equals(evt.dataTransfer.dropEffect, "none", "The dropEffect attribute should ignore the invalid value.");
+        }, "Check if the dropEffect attribute ignore the invalid value");
+
+        test(function() {
+          evt.dataTransfer.dropEffect = "link";
+          assert_equals(evt.dataTransfer.dropEffect, "link", "The dropEffect attribute should be 'move'.");
+        }, "Check if the dropEffect attribute can be set by a valid value");
+      });
+
+      on_event(document.body, "dragenter", function(evt) {
+        test(function() {
+          assert_equals(evt.dataTransfer.effectAllowed, "move");
+        }, "DataTransfer.effectAllowed must be unchanged to a new valid value when drag enters");
+
+        test(function() {
+          assert_equals(evt.dataTransfer.dropEffect, "move");
+        }, "DataTransfer.dropEffect is initialized by evt.dataTransfer.effectAllowed when drag enters");
+
+        done();
+      });
+    </script>
+  </body>
+</html>

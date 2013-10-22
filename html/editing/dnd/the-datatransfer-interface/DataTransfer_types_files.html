@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>HTML Test: DataTransfer_types_files</title>
+    <link rel="author" title="Intel" href="http://www.intel.com">
+    <link rel="help" href="http://www.w3.org/TR/2012/CR-html5-20121217/editing.html#dom-datatransfer-types">
+    <meta name="flags" content="interact">
+    <meta name="asssert" content="Check the types attributes of DataTransfer interface when dragging a file">
+    <script src="/resources/testharness.js"></script>
+    <script src="/resources/testharnessreport.js"></script>
+    <style>
+      #test { 
+        border: 2px solid blue; 
+        display: block;
+        height: 200px;
+        width: 200px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Steps:</h2>
+    <ol>
+      <li>Drag a file from file system to the blue suqure below.</li>
+      <li>Drop it.</li>
+    </ol>
+    <h2>Expected result:</h2>
+    <p>PASS</p>
+    <input id="test" type="file">
+    <div id="log"></div>
+
+    <script>
+      setup({explicit_timeout: true, explicit_done: true});
+      on_event(document.getElementById("test"), "drop", function (evt) {        
+        evt.preventDefault();
+        test(function() {
+          var types = evt.dataTransfer.types;
+          assert_equals(types.length, 1, "The length of type attribute should be 1.");
+          assert_equals(types[0], "Files", "The first item of the type attribute should be 'Files'.");
+        }, "Check the types length when dragging a file.");
+
+        test(function() {
+          assert_true(evt.dataTransfer.files instanceof FileList);
+          assert_equals(evt.dataTransfer.files.length, 1, "The files length should be 1.");
+        }, "Check the length of the files attribute when dragging a file.");
+
+        done();
+      }, false);
+
+      on_event(document.getElementById("test"), "dragend", function(){
+        evt.preventDefault();
+      });
+    </script>
+  </body>
+</html>

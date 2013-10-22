@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>HTML Test: DataTransfer_types_text</title>
+    <link rel="author" title="Intel" href="http://www.intel.com">
+    <link rel="help" href="http://www.w3.org/TR/2012/CR-html5-20121217/editing.html#dom-datatransfer-types">
+    <meta name="flags" content="interact">
+    <meta name="asssert" content="Check the types attributes of DataTransfer interface when dragging text">
+    <script src="/resources/testharness.js"></script>
+    <script src="/resources/testharnessreport.js"></script>
+  </head>
+  <body>
+    <h2>Steps:</h2>
+    <ol>
+      <li>Select all characters in the textbox below.</li>
+      <li>Drag it out of the textbox.(Execute the steps in 10 seconds)</li>
+    </ol>
+    <h2>Expected result:</h2>
+    <p>PASS</p>
+    <input id="test" type="text" value="Drag me">
+    <div id="log"></div>
+
+    <script>
+      var t = async_test("Check the type attributes of DataTransfer interface when dragging text");
+
+      setup({timeout: 10000});
+
+      document.getElementById("test").addEventListener("dragstart", function(evt) {
+        t.step(function() {
+          var data =  evt.dataTransfer;
+          data.setData("text", "test");
+          data.setData("url", "http://www.intel.com");
+
+          assert_equals(evt.dataTransfer.types.length, 2);
+          assert_equals(evt.dataTransfer.types[0], "text/plain", "The type attribute should be 'text/plain'.");
+          assert_equals(evt.dataTransfer.types[1], "text/uri-list", "The type attribute should be 'text/plain'.");
+        }, "Check the types attribute of dataTransfer interface");
+        t.done();
+      }, false);
+    </script>
+  </body>
+</html>

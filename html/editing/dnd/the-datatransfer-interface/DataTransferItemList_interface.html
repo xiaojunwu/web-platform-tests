@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>HTML Test: DataTransferItemList_interface</title>
+    <link rel="author" title="Intel" href="http://www.intel.com">
+    <link rel="help" href="http://www.w3.org/TR/2012/CR-html5-20121217/editing.html#the-datatransferitemlist-interface">
+    <meta name="flags" content="interact">
+    <meta name="assert" content="Check the the DataTransferItemList interface">
+    <script src="/resources/testharness.js"></script>
+    <script src="/resources/testharnessreport.js"></script>
+  </head>
+  <body>
+    <h2>Steps:</h2>
+    <ol>
+      <li>Select all characters in the first textbox below.</li>
+      <li>Drag it to the second textbox below.</li>
+      <li>Drop it.</li>
+      <li>Check the result.</li>
+    </ol>
+    <h2>Expected result:</h2>
+    <p>PASS</p>
+    <input id="test1" type="text" value="Drag me">
+    <input id="test2" type="text">
+    <div id="log"></div>
+    <script>
+      setup({explicit_done: true, explicit_timeout: true});
+
+      on_event(document.getElementById("test1"), "dragstart", function(evt) {
+        test(function () {
+          evt.dataTransfer.clearData();
+          assert_equals(evt.dataTransfer.items.length, 0, "The value of dataTransfer.items.length should be 0.");
+        }, "Check if there is no any data when drag starts");
+
+        test(function () {
+          evt.dataTransfer.clearData();
+          addTwoItems(evt);
+          assert_equals(evt.dataTransfer.items.length, 2, "The value of dataTransfer.items.length should be 1.");
+        }, "Check if string data added when add method invoked");
+
+        test(function () {
+          evt.dataTransfer.clearData();
+          assert_throws("NotSupportedError", function () {
+            addTwoItems(evt);
+            addTwoItems(evt);
+          }, "The NotSupportedError should be thrown.");
+        }, "Check if the NotSupportedError will be thrown when add a string with a existing type");
+
+        test(function () {
+          evt.dataTransfer.clearData();
+          addTwoItems(evt);
+          assert_true(evt.dataTransfer.items[0] instanceof DataTransferItem);
+          assert_class_string(evt.dataTransfer.items[0], "DataTransferItem", "Each item should be a DataTransferItem object.");
+          assert_equals(evt.dataTransfer.getData("text/plain"), "test", "The value of the second item should be 'www.intel.com'.");
+        }, "Check the getter of the DataTransferItemList interface");
+
+        test(function () {
+          evt.dataTransfer.clearData();
+          addTwoItems(evt);
+          delete(evt.dataTransfer.items[0]);
+          assert_equals(evt.dataTransfer.items.length, 1, "The item is not deleted.");
+        }, "Check the deleter of the DataTransferItemList interface");
+
+        test(function () {
+          evt.dataTransfer.clearData();
+          addTwoItems(evt);
+          evt.dataTransfer.items.clear();
+          assert_equals(evt.dataTransfer.items.length, 0, "The value of dataTransfer.items.length should be 0.");
+          evt.dataTransfer.items.add("test", "text/plain");
+        }, "Check if string data cleared when clear method invoked");
+      });
+
+      on_event(document.getElementById("test2"), "drop", function(evt) {
+        test(function () {
+          evt.dataTransfer.items.clear();
+          assert_equals(evt.dataTransfer.items.length, 1, "The clear method should not clear the data from the data store.");
+        }, "Check if the clear method will not remove data when the DataTransferItemList is not in read/write mode.");
+
+        test(function () {
+          assert_throws("InvalidStateError", function () {delete evt.dataTransfer.items[0];}, "The InvalidStateError should be thrown.");
+        }, "Check if the InvalidStateError will be thrown when the DataTransferItemList is not in read/write mode.");
+
+        done();
+      });
+
+      function addTwoItems(e) {
+        e.dataTransfer.items.add("www.w3.com", "text/url-list");
+        e.dataTransfer.items.add("test", "text/plain");
+      }
+    </script>
+  </body>
+</html>

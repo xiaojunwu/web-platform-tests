@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>HTML Test: DataTransferItem_drag_stirng</title>
+    <link rel="author" title="Intel" href="http://www.intel.com">
+    <link rel="help" href="http://www.w3.org/TR/2012/CR-html5-20121217/editing.html#dom-datatransferitem-getasstring">
+    <meta name="flags" content="interact">
+    <meta name="assert" content="Check the DataTransferItemList interface when dragging a file">
+    <script src="/resources/testharness.js"></script>
+    <script src="/resources/testharnessreport.js"></script>
+    <script>
+      var oFReader = new FileReader(),
+          rFilter = /^image\/png$/i,
+          oFile;
+
+      function loadImageFile() {
+        if (document.getElementById("test").files.length === 0) { return; }
+        oFile = document.getElementById("test").files[0];
+        if (!rFilter.test(oFile.type)) { alert("You must select a png file!"); return; }
+      }
+    </script>
+  </head>
+  <body>
+    <h2>Steps:</h2>
+    <ol>
+      <li>Drag a png image from file system onto the square with blue borders below.</li>
+      <li>Drag it.</li>
+      <li>Check the result.</li>
+    </ol>
+    <h2>Expected result:</h2>
+    <p>PASS</p>
+    <div id="log"></div>
+    <input id="test" type="file" style="border: 2px solid blue; height: 200px; width: 200px;" onchange="loadImageFile()">
+
+    <script>
+      setup({explicit_done: true, explicit_timeout: true});
+
+      on_event(document.getElementById("test"), "drop", function(evt) {
+        test(function () {
+          var item = evt.dataTransfer.items[0];
+          var file1 = item.getAsFile();
+          assert_true(file1 instanceof File, "The getAsFile method should return a file when dragging file.");
+        }, "Check if getAsFile get a file when dragging file");
+
+        test(function () {
+          assert_equals(evt.dataTransfer.items[0].kind, "file", "The kind attribute should be 'Files'.");
+        }, "Check the kind attribute when dragging a file");
+
+        test(function () {
+           assert_equals(evt.dataTransfer.items[0].type, "image/png", "The type attribute should be 'image/png'.");
+        }, "Check the type attribute when dragging a file");
+
+        done();
+      });
+    </script>
+  </body>
+</html>
