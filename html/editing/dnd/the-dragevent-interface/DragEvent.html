@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>HTML Test: DragEvent</title>
+    <link rel="author" title="Intel" href="http://www.intel.com">
+    <link rel="help" href="http://www.w3.org/TR/2012/CR-html5-20121217/editing.html#dom-datatransfer-getdata">
+    <meta name="flags" content="interact">
+    <meta name="assert" content="Check the dragEvent interface">
+    <script src="/resources/testharness.js"></script>
+    <script src="/resources/testharnessreport.js"></script>
+  </head>
+  <body>
+    <h2>Steps:</h2>
+    <ol>
+      <li>Drag the blue square.</li>
+    </ol>
+    <h2>Expected result:</h2>
+    <p>PASS</p>
+    <input type="text" id="test1" value="Drag me">
+    <input type="text" id="test2" value="">
+    <div id="log"></div>
+    <script>
+      var source,
+          target;
+
+      setup(function () {
+        source = document.getElementById("test1");
+        target = document.getElementById("test2");
+        source.select();
+      }, {explicit_timeout: true, explicit_done: true});
+
+      on_event(source, "dragstart", function(evt) {
+        test(function () {
+          var data1 = evt.dataTransfer.getData("text/plain");
+          assert_equals(data1, "Drag me", "The data store should be readable.");
+          evt.dataTransfer.setData("text/plain", "test");
+          var data2 = evt.dataTransfer.getData("text/plain");
+          assert_equals(data2, "test", "The data store should be writable.");
+        }, "1. Check if the data store is read/write mode");
+
+        test(function () {
+          var effect = evt.dataTransfer.effectAllowed;
+          assert_equals(effect, "uninitialized", "The effectAllowed should be 'none'.");
+        }, "2. Check the effectAllowed while the dragstart event");
+
+        test(function () {
+          var effect = evt.dataTransfer.dropEffect;
+          assert_equals(effect, "none", "The dropEffect should be 'none'.");
+        }, "3. Check the dropEffect while the dragstart event");
+
+        evt.dataTransfer.effectAllowed = "move";
+      });
+
+      on_event(source, "drag", on_drag);
+      on_event(source, "dragleave", on_dragleave);
+      on_event(target, "dragenter", on_dragenter);
+      on_event(target, "dragover", on_dragover);
+
+      on_event(target, "drop", function(evt) {
+        test(function () {
+          var data1 = evt.dataTransfer.getData("text/plain");
+          assert_equals(data1, "test", "The data store should be readable.");
+          try {
+            evt.dataTransfer.setData("text/plain", "test");
+          } catch(e) {}
+          var data2 = evt.dataTransfer.getData("text/plain");
+          assert_equals(data2, "test", "The data store should not be writable.");
+        }, "8. Check if the data store is readonly mode while the drop event");
+
+        test(function () {
+          var effect = evt.dataTransfer.dropEffect;
+          assert_true(/move|copy/.test(effect), "The dropEffect should be 'copy' or 'move'.");
+        }, "9. Check if dropEffect bases on effectAllowed while the drop event");
+      });
+
+      on_event(source, "dragend", function(evt) {        
+        test(function () {
+          var effect = evt.dataTransfer.dropEffect;
+          assert_true(/move|copy/.test(effect), "The dropEffect should be 'copy' or 'move'.");
+        }, "10. Check if dropEffect bases on effectAllowed while the dragend event");
+        done();
+      });
+
+      function on_drag(evt) {
+        source.removeEventListener("drag", on_drag, false);
+        test(function () {
+          var effect = evt.dataTransfer.dropEffect;
+          assert_equals(effect, "none", "The dropEffect should be 'none'.");
+        }, "4. Check the dropEffect while the drag event");
+      }
+
+      function on_dragleave(evt) {
+        evt.stopPropagation();
+        source.removeEventListener("dragleave", on_dragleave, false);
+        test(function () {
+          var effect = evt.dataTransfer.dropEffect;
+          assert_equals(effect, "none", "The dropEffect should be 'none'.");
+        }, "5. Check the dropEffect while the dragleave event");
+      }
+
+      function on_dragenter(evt) {
+        evt.stopPropagation();
+        target.removeEventListener("dragenter", on_dragenter, false);
+        test(function () {
+          var effect = evt.dataTransfer.dropEffect;
+          assert_equals(effect, "move", "The dropEffect should be 'copy'.");
+        }, "6. Check if dropEffect bases on effectAllowed while the dragenter event");
+      }
+
+      function on_dragover(evt) {
+        evt.stopPropagation();
+        target.removeEventListener("dragover", on_dragover, false);
+        test(function () {
+          var effect = evt.dataTransfer.dropEffect;
+          assert_equals(effect, "move", "The dropEffect should be 'copy'.");
+        }, "7. Check if dropEffect bases on effectAllowed while the dragover event");
+      }
+    </script>
+  </body>
+</html>
