@@ -13,19 +13,20 @@
   <body>
     <h2>Steps:</h2>
     <ol>
-      <li>Select all characters in the textbox below.</li>
-      <li>Drag it out of the textbox.</li>
+      <li>Select all characters in the first textbox below.</li>
+      <li>Drag it to the second textbox.</li>
+      <li>Drop it.</li>
       <li>Check the result.</li>
     </ol>
     <h2>Expected result:</h2>
     <p>PASS</p>
+    <input id="test1" type="text" value="Drag me">
+    <input id="test2" type="text">
     <div id="log"></div>
-    <input id="test" type="text" value="Drag me"">
-
     <script>
       setup({explicit_done: true, explicit_timeout: true});
 
-      on_event(document.getElementById("test"), "dragstart", function(evt) {
+      on_event(document.getElementById("test1"), "dragstart", function(evt) {
         test(function () {
           var item = evt.dataTransfer.items[0];
           var file1 = item.getAsFile();
@@ -44,10 +45,35 @@
         }, "Check the kind attribute when dragging a string");
 
         test(function () {
-           assert_equals(evt.dataTransfer.items[0].type, "text/plain", "The type attribute should be 'string'.");
+          assert_equals(evt.dataTransfer.items[0].type, "text/plain", "The type attribute should be 'string'.");
         }, "Check the type attribute when dragging a string");
 
+        test(function () {
+          var item = evt.dataTransfer.items[0];
+          item.kind = "Files";
+          item.getAsString( function(data) {
+            assert_unreached("The callback should not be invoked when the kind of DataTransferItem is not 'string'.");
+          });
+        }, "Check if the callback can not be invoked when the kind of DataTransferItem is not 'string'.");
+      });
+
+      on_event(document.getElementById("test2"), "drop", function(evt) {
+        test(function () {
+          var item = evt.dataTransfer.items[0];
+          item.getAsString( function(data) {
+            assert_equals(data, "Drag me", "The getAsString method should return the dragged string");
+          });
+        }, "Check if the callback of getAsString method can be invoked in readonly mode");
         done();
+      });
+
+      on_event(document.getElementById("test2"), "dragenter", function(evt) {
+        test(function () {
+          var item = evt.dataTransfer.items[0];
+          item.getAsString( function(data) {
+            assert_unreached("The callback should not be invoked.");
+          });
+        }, "Check if the callback of getAsString method can not be invoked in read/write or readonly mode");
       });
     </script>
   </body>
