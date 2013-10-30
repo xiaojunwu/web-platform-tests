@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>HTML Test: HTMLAllCollection interface</title>
+    <link rel="author" title="Intel" href="http://www.intel.com/">
+    <link rel="help" href="http://www.w3.org/TR/2012/CR-html5-20121217/infrastructure.html#htmlallcollection-0">
+    <script src="/resources/testharness.js"></script>
+    <script src="/resources/testharnessreport.js"></script>
+  </head>
+  <body>
+    <div id="log"></div>
+    <p name="p1"></p>
+    <input name="rdo" style="display:none"><input name="rdo" style="display:none">
+    <script>
+      var collections,
+          div;
+
+      var arr = [
+        {tag:"a", id: "a", name: "test0"},
+        {tag:"applet", id: "app", name: "test1"},
+        {tag:"area", id: "area", name: "test2"},
+        {tag:"embed", id: "ebd", name: "test3"},
+        {tag:"form", id: "fm", name: "test4"},
+        {tag:"frameset", id: "fs", name: "test5"},
+        {tag:"frame", id: "fr", name: "test6"},
+        {tag:"iframe", id: "ifr", name: "test7"},
+        {tag:"img", id: "img", name: "test8"},
+        {tag:"object", id: "obj", name: "test9"}
+      ];
+
+      setup(function () {
+        collections = document.all;
+        div = document.getElementById("log");
+
+        for (var i = 0; i < arr.length; i++) {
+          var ele = document.createElement(arr[i].tag);
+          ele.style.display = "none";
+          ele.setAttribute("id", arr[i].id);
+          ele.setAttribute("name", arr[i].name);
+          document.body.appendChild(ele);
+          arr[i].result = document.all.namedItem(arr[i].name);
+          arr[i].expected = document.getElementById(arr[i].id);
+          document.body.removeChild(ele);
+        }
+      });
+
+      //length
+      test(function () {
+        assert_equals(document.all.length, 14, "The length attribute is incorrect.");
+      }, "HTMLAllCollection.length attribute returns the number of elements in the collection");
+
+      //getter - index
+      test(function () {
+        assert_equals(collections(9), div, "The HTMLAllCollection(index) should return a 'div' element.");
+      }, "HTMLAllCollection(index) must return the indexed item from the collection");
+
+      test(function () {
+        assert_equals(collections.item(9), div, "The HTMLAllCollection.item(index) should return a 'div' element.");
+      }, "HTMLAllCollection.item(index) must return the indexed item from the collection");
+
+      test(function () {
+        assert_equals(collections[9], div, "The HTMLAllCollection[index] should return a 'div' element.");
+      }, "HTMLAllCollection[index] must return the indexed item from the collection");
+
+      //getter - name
+      test(function () {
+        assert_equals(collections("log"), div, "The HTMLAllCollection(name) method should return a 'div' element");
+      }, "HTMLAllCollection(name) must return the named item from the collection");
+
+      test(function () {
+        assert_equals(collections.item("log"), div, "HTMLAllCollection.item(name) method should return a 'div' element.");
+      }, "HTMLAllCollection.item(name) must return the named item from the collection");
+
+      test(function () {name
+        assert_equals(collections.namedItem("log"), div, "The namedItem(name) method should return a 'div' element.");
+      }, "HTMLAllCollection.namedItem(name) must return the element with id attribute equals to 'name'");
+
+      test(function () {
+        assert_equals(collections.namedItem("log"), collections.item("log"),
+                      "The item(name) method can be used as a synonym for its namedItem(name) method.");
+      }, "HTMLAllCollection.namedItem(name) must be same as HTMLAllCollection.item(name)");
+
+      test(function () {
+        assert_equals(collections.item(""), null, "HTMLAllCollection.item('') method should be null.");
+        assert_equals(collections.namedItem(""), null, "HTMLAllCollection.namedItem('') method should be null.");
+      }, "HTMLAllCollection.namedItem(name) must return null if name is empty string");
+
+      test(function () {
+        assert_true(collections.item("log") instanceof Element, "The item(name) method returns an Element object.");
+        assert_true(collections.namedItem("log") instanceof Element, "The namedItem(name) method returns an Element object.");
+        assert_true(collections.item("rdo") instanceof HTMLCollection, "The namedItem(name) method returns an HTMLCollection object.");
+        assert_true(collections.namedItem("rdo") instanceof HTMLCollection, "The namedItem(name) method returns an HTMLCollection object.");
+      }, "The namedItem(name) must return an HTMLCollection or Elment object");
+
+      for (var i = 0; i < arr.length; i++) {
+        test(function () {
+          assert_true(!!arr[i].result, "The '" + arr[i].tag + "' element can not be find by the namedItem() method.");
+          assert_equals(arr[i].result, arr[i].expected, "The namedItem(name) method should return the named '"+ arr[i].tag +"' element.");
+        }, "The namedItem(name) should return the element with a name attribute equals to 'name' if the element is '" + arr[i].tag + "'");
+      }
+
+      test(function () {
+        assert_equals(collections.namedItem("test"), null, "The value of collections.item(name) method should return null.");
+      }, "HTMLAllCollection.namedItem(name) must return null if there is no matched element");
+
+      //tags method
+      test(function () {
+        assert_equals(collections.tags("input"), document.getElementsByTagName("input"), "Can not get the input collection.");
+      },  "The tages method return the matched html element already matches the filter of the HTMLAllCollection object");
+
+      test(function () {
+        assert_true(collections.tags("input") instanceof HTMLAllCollection, "Can not return a HTMLAllCollection object.");
+      }, "HTMLAllCollection.tags(name) must return an HTMLAllCollection");
+    </script>
+  </body>
+</html>
+
