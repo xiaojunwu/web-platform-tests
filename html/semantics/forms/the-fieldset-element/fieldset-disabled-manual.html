@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>HTML Test: fieldset-disabled</title>
+<link rel="author" title="Intel" href="http://www.intel.com/">
+<link rel="help" title="4.10.16 The fieldset element" href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-button-element.html#the-fieldset-element">
+<meta name="flags" content="">
+<meta name="assert" content="Check the rendering effect of disabled attribute">
+<p>Test passes if only the 'TEST' button is not disabled.</p>
+<fieldset disabled>
+  <legend><button>TEST</button></legend>
+  <legend><input></legend>  
+  <keygen/>
+  <select></select>
+  <textarea></textarea>
+</fieldset>
+
